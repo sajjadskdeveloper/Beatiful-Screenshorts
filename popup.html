@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Screenshots</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📸 Beautiful Screenshots</h1>
+            <p>Capture and edit your screenshots</p>
+        </div>
+        
+        <div class="buttons">
+            <button id="fullscreenBtn" class="btn btn-primary">
+                <span class="icon">🖥️</span>
+                Full Screen Screenshot
+            </button>
+            
+            <button id="areaBtn" class="btn btn-secondary">
+                <span class="icon">✂️</span>
+                Select Area
+            </button>
+        </div>
+        
+        <div class="settings">
+            <div class="setting-item">
+                <label for="editorToggle" class="setting-label">
+                    <span class="icon">🎨</span>
+                    Open Editor
+                </label>
+                <div class="toggle-container">
+                    <input type="checkbox" id="editorToggle" class="toggle-input" checked>
+                    <label for="editorToggle" class="toggle-label"></label>
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="applySettingsToggle" class="setting-label">
+                    <span class="icon">⚙️</span>
+                    Apply Saved Settings
+                </label>
+                <div class="toggle-container">
+                    <input type="checkbox" id="applySettingsToggle" class="toggle-input" checked>
+                    <label for="applySettingsToggle" class="toggle-label"></label>
+                </div>
+            </div>
+            <div class="setting-description">
+                <small>When Editor OFF: Apply saved background settings before copying to clipboard</small>
+            </div>
+        </div>
+        
+        <div class="info">
+            <p>💡 <strong>Tip:</strong> Use "Select Area" to capture specific parts of the page</p>
+            <p>⌨️ <strong>Shortcut:</strong> Press <kbd>Ctrl+Shift+S</kbd> to quickly select an area</p>
+        </div>
+        
+        <div class="footer">
+            <small>Click outside the popup to close</small>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html> 
