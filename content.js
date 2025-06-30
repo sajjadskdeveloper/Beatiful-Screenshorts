@@ -5,6 +5,9 @@ let startX, startY;
 let isOpenEditor = true;
 let isApplySettings = true;
 
+// Global reference for the editor window
+let editorWindow = null;
+
 // Listen for messages from popup and background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Content script received message:', request);
@@ -41,6 +44,7 @@ function takeFullScreenshot(openEditor = true, applySettings = true) {
 }
 
 function startAreaSelection(openEditor = true, applySettings = true) {
+    cleanupSelection(); // Always cleanup before starting
     if (isSelecting) return;
     
     isSelecting = true;
@@ -137,6 +141,7 @@ function onMouseUp(e) {
     if (!isSelecting || !selectionBox) return;
     
     const rect = selectionBox.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
     
     // Temporarily hide the selection box and overlay before taking screenshot
     if (selectionBox) {
@@ -153,15 +158,15 @@ function onMouseUp(e) {
     
     // Small delay to ensure UI is hidden before screenshot
     setTimeout(() => {
-        // Send selection data to background script
+        // Send selection data to background script, adjusted for scroll and DPR
         chrome.runtime.sendMessage({
             action: 'captureScreenshot',
             data: {
                 type: 'area',
-                x: rect.left,
-                y: rect.top,
-                width: rect.width,
-                height: rect.height
+                x: rect.left * dpr,
+                y: rect.top * dpr,
+                width: rect.width * dpr,
+                height: rect.height * dpr
             },
             openEditor: isOpenEditor,
             applySettings: isApplySettings
@@ -465,17 +470,17 @@ function roundRect(ctx, x, y, width, height, radius) {
 }
 
 function openEditorWindow(screenshotDataUrl) {
-    // Create editor window with screenshot data in URL
+    // Close previous editor window if open
+    if (editorWindow && !editorWindow.closed) {
+        editorWindow.close();
+    }
     const editorUrl = chrome.runtime.getURL('editor.html');
     const encodedScreenshot = encodeURIComponent(screenshotDataUrl);
     const editorUrlWithData = `${editorUrl}?screenshot=${encodedScreenshot}`;
-    
-    const editorWindow = window.open(editorUrlWithData, 'screenshot-editor', 
+    editorWindow = window.open(editorUrlWithData, 'screenshot-editor', 
         'width=1200,height=800,resizable=yes,scrollbars=yes');
-    
     // Store the screenshot data globally so the editor can access it
     window.screenshotDataUrl = screenshotDataUrl;
-    
     // Send screenshot data to editor with a delay to ensure window is loaded
     setTimeout(() => {
         if (editorWindow && !editorWindow.closed) {
@@ -490,7 +495,6 @@ function openEditorWindow(screenshotDataUrl) {
             }
         }
     }, 500);
-    
     // Also try sending the message when the window loads
     editorWindow.addEventListener('load', () => {
         setTimeout(() => {
